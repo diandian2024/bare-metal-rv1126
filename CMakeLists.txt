@@ -27,27 +27,37 @@ add_executable(rv1126-baremetal
     pre_c.c main.c
 )
 
-add_custom_target(${PROJECT_NAME}.bin
+add_custom_target(${PROJECT_NAME}.bin ALL
     DEPENDS ${PROJECT_NAME}
     COMMAND ${CMAKE_OBJCOPY} -O binary ${CMAKE_BINARY_DIR}/${PROJECT_NAME} ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.bin
 )
 
-add_custom_target(${PROJECT_NAME}.img
-    DEPENDS ${PROJECT_NAME}.bin
-    COMMAND rm -rf ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.img
-    COMMAND dd if=/dev/zero of=${CMAKE_BINARY_DIR}/${PROJECT_NAME}.img bs=4096 count=16384
-    COMMAND dd if=${CMAKE_BINARY_DIR}/${PROJECT_NAME}.bin of=${CMAKE_BINARY_DIR}/${PROJECT_NAME}.img bs=4096 conv=notrunc
-)
+if(USE_QEMU)
+    add_custom_target(${PROJECT_NAME}.img ALL
+        DEPENDS ${PROJECT_NAME}.bin
+        COMMAND rm -rf ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.img
+        COMMAND dd if=/dev/zero of=${CMAKE_BINARY_DIR}/${PROJECT_NAME}.img bs=4096 count=16384
+        COMMAND dd if=${CMAKE_BINARY_DIR}/${PROJECT_NAME}.bin of=${CMAKE_BINARY_DIR}/${PROJECT_NAME}.img bs=4096 conv=notrunc
+    )
+else(USE_QEMU)
+    add_custom_target(${PROJECT_NAME}.img ALL
+        DEPENDS ${PROJECT_NAME}.bin
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/tools/boot_merger ${CMAKE_CURRENT_SOURCE_DIR}/tools/RV1126_BAREMETAL.ini
+    )
+endif(USE_QEMU)
 
-add_custom_target(${PROJECT_NAME}.asm
+
+add_custom_target(${PROJECT_NAME}.asm ALL
     DEPENDS ${PROJECT_NAME}
     COMMAND ${CMAKE_OBJDUMP} -dCS ${CMAKE_BINARY_DIR}/${PROJECT_NAME} > ${CMAKE_BINARY_DIR}/${PROJECT_NAME}.asm
 )
 
 add_custom_target(size
-    DEPENDS ${PROJECT_NAME} ${PROJECT_NAME}.img ${PROJECT_NAME}.bin ${PROJECT_NAME}.asm
+    DEPENDS ${PROJECT_NAME}
     COMMAND ${CMAKE_SIZE} ${CMAKE_BINARY_DIR}/${PROJECT_NAME}
 )
+
 
 # include(CTest)
 # enable_testing()
