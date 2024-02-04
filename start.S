@@ -17,12 +17,32 @@ __start:
 	ldr pc, =arm_fiq
 
 __reset:
+    /* relocate self */ 
+	adr r0, __start  
+	ldr r1, =__start
+					
+	cmp r0, r1
+	beq relocate_complete
+	
+	ldr r2, =__bss_s__
+
+cpy:
+	ldr r3, [r0]
+	add r0, r0, #4
+	
+	str r3, [r1]
+	add r1, r1, #4
+
+	cmp r1, r2      
+	blo cpy
+
+relocate_complete:
 	/* Set vector base address register */
 	ldr r0, =__start
 	mcr p15, 0, r0, c12, c0, 0
 	mrc p15, 0, r0, c1, c0, 0
 	bic r0, #(1 << 13)
-	mcr p15, 0, r0, c1, c0, 0
+	mcr p15, 0, r0, c1, c0, 0    
 
     /* Enable neon/vfp unit */
 	mrc p15, 0, r0, c1, c0, 2
@@ -65,3 +85,11 @@ __reset:
     mov sp, r9
 
     b pre_c
+
+
+flag_1:
+    movw r0, #0x0000
+    movt r0, #0xff57
+    mov r1, 0x3E
+    str r1, [r0]
+    bx lr

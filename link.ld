@@ -1,6 +1,9 @@
 MEMORY
 {
-    DRAM    (rwx): ORIGIN = 0x00400000, LENGTH = 1M
+    /*
+		DRAM    (rwx): ORIGIN = 0x00400000, LENGTH = 1M
+	*/
+	DRAM    (rwx): ORIGIN = 0x200000, LENGTH = 64K
 }
 
 ENTRY(__start)
@@ -24,41 +27,42 @@ SECTIONS
 		*(.ARM.exidx* .gnu.linkonce.armexidx.*)
 	} > DRAM
     
-    __etext = ALIGN (4);
-    .data : AT (__etext)
+    __rom_data_s__ = ALIGN (4);
+
+    .data : AT (__rom_data_s__)
 	{
         . = ALIGN(4);
-        __data_s__ = .;
+        PROVIDE(__data_s__ = .);
         *(.data*)
         . = ALIGN(4);
-        __data_e__ = .;
+        PROVIDE(__data_e__ = .);
     } > DRAM
 
     .bss :
 	{
 		. = ALIGN(4);
-		PRIVATE(__bss_s__ = .);
+		PROVIDE(__bss_s__ = .);
 		*(.bss*)
 		*(COMMON)
 		. = ALIGN(4);
-		PRIVATE(__bss_e__ = .);
+		PROVIDE(__bss_e__ = .);
 	} > DRAM
 
     .stack (NOLOAD):
 	{
 		. = ALIGN(4);
-		PRIVATE(__stack_s__ = .);
+		PROVIDE(__stack_s__ = .);
 		*(.stack*)
 		. = ALIGN(4);
-		PRIVATE(__stack_e__ = .);
+		PROVIDE(__stack_e__ = .);
 	} > DRAM
 
     .heap (NOLOAD):
 	{
 		. = ALIGN(4);
-		PRIVATE(__heap_s__ = .);
+		PROVIDE(__heap_s__ = .);
 		*(.heap*)
 		. = ALIGN(4);
-		PRIVATE(__heap_e__ = .);
+		PROVIDE(__heap_e__ = .);
 	} > DRAM
 }

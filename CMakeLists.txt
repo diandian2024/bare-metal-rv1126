@@ -58,6 +58,11 @@ add_custom_target(size
     COMMAND ${CMAKE_SIZE} ${CMAKE_BINARY_DIR}/${PROJECT_NAME}
 )
 
+add_custom_target(download_and_run
+    DEPENDS ${PROJECT_NAME}.img
+    COMMAND rkdeveloptool db ${CMAKE_CURRENT_SOURCE_DIR}/build/rv1126-baremetal.img.bin
+    COMMAND rkdeveloptool ul ${CMAKE_CURRENT_SOURCE_DIR}/build/rv1126-baremetal.img.bin
+)
 
 # include(CTest)
 # enable_testing()
