@@ -2,8 +2,9 @@ MEMORY
 {
     /*
 		DRAM    (rwx): ORIGIN = 0x00400000, LENGTH = 1M
+		DRAM    (rwx): ORIGIN = 0x200000, LENGTH = 64K
 	*/
-	DRAM    (rwx): ORIGIN = 0x200000, LENGTH = 64K
+	DRAM	(rwx): ORIGIN = 0x00000000, LENGTH = 2048M
 }
 
 ENTRY(__start)
