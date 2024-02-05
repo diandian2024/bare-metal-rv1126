@@ -13,12 +13,14 @@ add_compile_options(
     -target arm-none-unknown-eabihf -mcpu=cortex-a7
     -mfpu=neon-vfpv4 -mfloat-abi=hard
     -fno-builtin -static -fno-pic
+    -ffunction-sections -fdata-sections
 )
 
 add_link_options(
     -fuse-ld=lld -static
     -target arm-none-unknown-eabihf -mcpu=cortex-a7
     -nostdlib -nostartfiles -nodefaultlibs
+    -Wl,--gc-sections
     -T ${LINKER_SCRIPT}
 )
 
